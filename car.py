@@ -2,8 +2,6 @@
 
 import math
 
-from track.track import Track
-
 class Car:
     def __init__(self, driver_name: str, car_number: int) -> None:
         raise NotImplementedError("Car class must be inherited by a child class")

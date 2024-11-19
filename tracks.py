@@ -1,7 +1,7 @@
 # ALUMNOS: NO MODIFICAR ESTE ARCHIVO NI USAR ESTAS FUNCIONES EN SU CODIGO
 
 import numpy as np
-from track.utils.bezier import Bezier
+from bezier import Bezier
 
 def calculate_custom_point(p1, p2, perc):
     if not (0 <= perc <= 1):

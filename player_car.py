@@ -1,4 +1,4 @@
-from car.car import Car
+from car import Car
 
 class PlayerCar(Car):
     def __init__(self, driver_name: str, car_number: int, movement_keys: list):

@@ -5,8 +5,8 @@ from scipy.spatial import ConvexHull
 from shapely.geometry import LineString, Point, MultiPoint
 import math
 import pygame
-from car.car import Car
-from track.utils.track_utils import curve_corners, random_midpoint
+#from car import Car
+from track import curve_corners, random_midpoint
 
 class Track:
     def __init__(self, num_points: int=15, corner_cells: int=20, x_max: int=800, y_max: int=600, width: int=20, margin_x: int=50, margin_y: int=50):
@@ -140,7 +140,7 @@ class Track:
         """
         trajectory_line = LineString(trajectory)
         return trajectory_line.intersects(self.finish_line)
-    
+
     def move_car(self, car: Car):
         """
         Moves the car
@@ -156,7 +156,6 @@ class Track:
         position[0] += speed * math.cos(car.get_direction())
         position[1] += speed * math.sin(car.get_direction())
         car.set_position(position)
-
 if __name__ == "__main__":
     # Inicializa Pygame
     pygame.init()
