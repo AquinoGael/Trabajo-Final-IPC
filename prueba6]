@@ -285,7 +285,16 @@ def draw_track(screen, track):
     
     # Dibujar la línea de meta
     finish_line_start, finish_line_end = track.finish_line
-    pygame.draw.line(screen, RED, list(map(int, finish_line_start)), list(map(int, finish_line_end)), 5)
+    finish_line_image = pygame.image.load("finish_line.png")
+    finish_line_rect = finish_line_image.get_rect()
+    finish_line_length = np.linalg.norm(np.array(finish_line_end) - np.array(finish_line_start))
+    scale_factor = finish_line_length / finish_line_rect.width
+    new_height = int(finish_line_rect.height * 0.2)  # Reducir grosor de la imagen
+    finish_line_image = pygame.transform.scale(finish_line_image, (int(finish_line_length), new_height))
+    finish_line_angle = math.degrees(math.atan2(finish_line_end[1] - finish_line_start[1], finish_line_end[0] - finish_line_start[0]))
+    finish_line_image = pygame.transform.rotate(finish_line_image, -finish_line_angle)
+    finish_line_rect = finish_line_image.get_rect(center=((finish_line_start[0] + finish_line_end[0]) // 2, (finish_line_start[1] + finish_line_end[1]) // 2))
+    screen.blit(finish_line_image, finish_line_rect.topleft)
 
 # Crear instancia de Track
 track = Track()
