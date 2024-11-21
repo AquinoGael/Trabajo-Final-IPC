@@ -17,7 +17,7 @@ class PlayerCar(Car):
         """
         super().init(driver_name, car_number)
         self.movement_keys = movement_keys
-        self.car_image = pygame.image.load("cars.png")  # Load car image for player cars
+        self.car_image = pygame.image.load("autos/mclaren_car.png")  # Load car image for player cars
         self.car_image = pygame.transform.scale(self.car_image, (60, 40))  # Adjust car image size (height greater than width)
         self.set_position(spawn_point)  # Set initial position to the spawn point
 
