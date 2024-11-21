@@ -298,7 +298,7 @@ def draw_track(screen, track):
         inner_coords = np.array(track.inner_track).astype(int)
         middle_coords = np.array(track.middle_of_track).astype(int)
         combined_coords = np.vstack((middle_coords, inner_coords[::-1]))
-        track_texture = pygame.image.load("asphalt.png")
+        track_texture = pygame.image.load("imagenes_pista/asphalt.png")
         track_texture = pygame.transform.scale(track_texture, (SCREEN_WIDTH, SCREEN_HEIGHT))
         track_mask = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
         pygame.draw.polygon(track_mask, (255, 255, 255), combined_coords)
@@ -312,7 +312,7 @@ def draw_track(screen, track):
     
     # Dibujar la línea de meta
     finish_line_start, finish_line_end = track.finish_line
-    finish_line_image = pygame.image.load("finish_line.png")
+    finish_line_image = pygame.image.load("imagenes_pista/finish_line.png")
     finish_line_rect = finish_line_image.get_rect()
     finish_line_length = np.linalg.norm(np.array(finish_line_end) - np.array(finish_line_start))
     scale_factor = finish_line_length / finish_line_rect.width

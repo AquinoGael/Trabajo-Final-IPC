@@ -15,7 +15,7 @@ SCREEN_WIDTH = screen_info.current_w - 100
 SCREEN_HEIGHT = screen_info.current_h - 100
 
 import random
-background_images = ["grass.png"]
+background_images = ["imagenes_pista/grass.png"]
 selected_image = random.choice(background_images)
 background_image = pygame.image.load(selected_image)
 background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))

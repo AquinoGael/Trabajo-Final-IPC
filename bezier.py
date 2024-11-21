@@ -43,3 +43,4 @@ class Bezier():
 
         curve = np.delete(curve, 0, 0)
         return curve
+    
