@@ -4,6 +4,7 @@ from scipy.spatial import ConvexHull
 from shapely.geometry import LineString, Polygon, MultiLineString, Point
 import math
 from tracks import curve_corners, random_midpoint
+from car3 import *
 
 # Inicializar Pygame
 pygame.init()
@@ -17,7 +18,6 @@ SCREEN_HEIGHT = screen_info.current_h - 100  # Reducir 100 píxeles del alto par
 
 
 # Seleccionar aleatoriamente una imagen de fondo
-
 
 # Colores
 WHITE = (255, 255, 255)
@@ -236,6 +236,31 @@ class Track:
         
         car_point = Point(point)
         return track_polygon.contains(car_point)
+
+    def check_lap(self, car: 'Car') -> bool:
+        """
+        Verifica si un coche ha completado una vuelta.
+
+        Args:
+            car (Car): La instancia del coche.
+
+        Returns:
+            bool: True si el coche ha completado una vuelta, False de lo contrario.
+        """
+        finish_line_start, finish_line_end = self.finish_line
+        car_x, car_y = car.get_position()
+
+
+
+        # Definir un rango de tolerancia para verificar si el coche está cerca de la línea de meta
+        tolerance = 0.01
+
+        # Verificar si la posición del coche está dentro del rango de la línea de meta
+        if (min(finish_line_start[0], finish_line_end[0]) - tolerance <= car_x <= max(finish_line_start[0], finish_line_end[0]) + tolerance and
+            min(finish_line_start[1], finish_line_end[1]) - tolerance <= car_y <= max(finish_line_start[1], finish_line_end[1]) + tolerance):
+            return True
+        return False
+
 # Dibujar la pista en Pygame
 def draw_track(screen, track):
     """

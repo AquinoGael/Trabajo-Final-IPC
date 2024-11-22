@@ -15,7 +15,7 @@ class AutoCar(Car):
         """
         super().init(driver_name, car_number)
         self.track = None  # Track instance to keep reference to the track
-        self.car_image = pygame.image.load("car.png")  # Load car image for auto cars
+        self.car_image = pygame.image.load("autos/car.png")  # Load car image for auto cars
         self.car_image = pygame.transform.scale(self.car_image, (40, 20))  # Scale car image to appropriate size
 
     def set_track(self, track: Track):

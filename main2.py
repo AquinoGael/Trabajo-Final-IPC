@@ -6,7 +6,34 @@ from auto_car2 import AutoCar
 from track import *
 import math
 from tracks import *
+import sys
 # Inicializar Pygame
+
+def draw_controls_message(screen):
+    """
+    Dibuja un mensaje en la parte inferior izquierda de la pantalla indicando cómo reiniciar o salir del juego.
+
+    Args:
+        screen (pygame.Surface): La superficie de la pantalla donde se dibuja el mensaje.
+    """
+    font = pygame.font.Font(None, 36)
+    message = "Para reiniciar carrera y mapa apretar R, para cerrar juego apretar Q"
+    text = font.render(message, True, (255, 255, 255))
+    text_rect = text.get_rect(bottomleft=(10, screen.get_height() - 10))
+    screen.blit(text, text_rect)
+
+# Ejemplo de uso
+# Crear una instancia de Track
+
+def draw_lap_counter(screen, car):
+    font = pygame.font.Font(None, 36)
+    lap_message = f"Vueltas: {car.lap_count}/5"
+    speed_message = f"Velocidad: {car.speed:.2f}"
+    lap_text = font.render(lap_message, True, (255, 255, 255))
+    speed_text = font.render(speed_message, True, (255, 255, 255))
+    screen.blit(lap_text, (10, 10))
+    screen.blit(speed_text, (10, 50))
+
 pygame.init()
 
 # Obtener tamaño de pantalla del usuario
@@ -83,6 +110,9 @@ track_polygon=track.get_track_area_polygon()
 running = True
 clock = pygame.time.Clock()
 
+winner_declared = False
+
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -92,24 +122,71 @@ while running:
     keys = pygame.key.get_pressed()
 
     # Obtener los comandos para los coches
-    insidetrack=player_car.is_inside_track(track)  # Aquí podrías añadir lógica para verificar si está dentro de la pista
-    auto_command = auto_car.get_command(keys, insidetrack)
-    player_command = player_car.get_command(keys, insidetrack)
+    if not winner_declared:
+        # Obtener los comandos para los coches
+        insidetrack = player_car.is_inside_track(track)
+        auto_command = auto_car.get_command(keys, insidetrack)
+        player_command = player_car.get_command(keys, insidetrack)
 
-    # Enviar comandos a los coches
-    auto_car.send_command(*auto_command,track)
-    player_car.send_command(*player_command,track)
-
+        # Enviar comandos a los coches
+        auto_car.send_command(*auto_command, track)
+        player_car.send_command(*player_command, track)
     # Dibujar fondo y pista
+    if player_car.lap_count > 5:
+            winner_declared = True
+            winner_text = "PlayerCar Gana!"
+            player_car.set_speed(0)
+            auto_car.set_speed(0)
+    elif auto_car.lap_count > 5:
+        winner_declared = True
+        winner_text = "AutoCar Gana!"
+        player_car.set_speed(0)
+        auto_car.set_speed(0)
+   
     screen.blit(background_image, (0, 0))  # Dibujar fondo primero
     draw_track(screen, track)  # Dibujar la pista después
 
     # Dibujar coches al final para que queden encima del fondo y la pista
     auto_car.draw(screen)
     player_car.draw(screen)
-    print(player_car.is_inside_track(track))
     # Actualizar la pantalla
+    if winner_declared:
+        font = pygame.font.Font(None, 74)
+        text = font.render(winner_text, True, (255, 255, 255))
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        screen.blit(text, text_rect)
+    
+    if keys[pygame.K_r]:
+        # Reiniciar el juego (volver a crear las instancias)
+        track = Track()
+        # Recalcular el spawn point
+        finish_line_start, finish_line_end = track.finish_line
+        midpoint = calculate_custom_point(finish_line_start, finish_line_end, 0.5)
+        direction_vector = np.array(finish_line_end) - np.array(finish_line_start)
+        direction_vector = direction_vector / np.linalg.norm(direction_vector)
+        perpendicular_vector = np.array([-direction_vector[1], direction_vector[0]])
+        spawn_distance = 50
+        spawn_point = midpoint - perpendicular_vector * spawn_distance
+
+        # Crear instancias del coche
+        auto_car = AutoCar("AutoBot", 1)
+        player_car = PlayerCar("Player1", 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist())
+        player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0]) + 8)
+        auto_car.set_track(track)
+
+
+        winner_declared = False
+        winner_text = ""
+    elif keys[pygame.K_q]:
+        pygame.quit()
+        sys.exit()
+    
+    draw_lap_counter(screen, player_car)  # Dibuja el contador de vueltas para el coche del jugador
+    draw_controls_message(screen)
+    
     pygame.display.flip()
+
+    
     clock.tick(100)
 
 

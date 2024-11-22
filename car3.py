@@ -16,6 +16,11 @@ class Car:
             driver_name (str): The name of the driver
             car_number (int): The number of the car
         """
+        self.lap_count = 0  # Contador de vueltas
+        self.last_position = [0.0, 0.0]  # Posición anterior
+        self.lap_block_ticks = 0  # Temporizador para bloquear el conteo de vueltas después de cruzar la meta
+
+        self.originalacceleration_rate = 0.08       # Acceleration per tick of time squared
         self.original_max_speed=10.0
         self.driver_name = driver_name
         self.car_number = car_number
@@ -27,7 +32,7 @@ class Car:
 
         # Car specifications
         self.max_speed = self.original_max_speed           # Maximum speed (0.5 units per tick of time)
-        self.acceleration_rate = 0.08       # Acceleration per tick of time squared
+        self.acceleration_rate = self.originalacceleration_rate       # Acceleration per tick of time squared
         self.turn_rate = math.radians(3)      # Turn rate in radians per tick of time (0.5 degrees)
 
     def get_speed(self) -> float:
@@ -121,7 +126,19 @@ class Car:
 
         return acceleration, steer
 
-    def send_command(self, acceleration: float, steer: float,track:Track):
+    def send_command(self, acceleration: float, steer: float,track,reduce_speed_outside_track: bool = True):
+        """
+        Envía el comando al coche y actualiza el contador de vueltas si se cruza la línea de meta.
+
+        Args:
+            acceleration (float): La aceleración del coche (cuánto acelerar o desacelerar en este paso de tiempo).
+            steer (float): El giro del coche (cuánto girar en este paso de tiempo).
+            track (Track): La pista para verificar si el coche está dentro del área permitida.
+        """
+        # Verificar si se ha completado una vuelta
+        if track and track.finish_line and track.check_lap(self) and self.lap_block_ticks == 0:
+            self.lap_count += 1
+            self.lap_block_ticks = 100  # Bloquear el conteo de vueltas por 100 ticks
         """
         Sends the command to the car
 
@@ -132,21 +149,27 @@ class Car:
         self.speed += acceleration
         self.speed = max(0, min(self.speed, self.max_speed))
 
-        # Reducir la velocidad si el coche está fuera de la pista
-        if not self.is_inside_track(track):
-            # Reducir la velocidad temporalmente si el coche está fuera de la pista
-            self.speed = max(self.speed / 2, self.original_max_speed / 10)
-            self.max_speed = self.original_max_speed / 2  # Limitar la velocidad máxima mientras esté fuera
-            # Ajustar la dirección para intentar volver a la pista
+        if not self.is_inside_track(track) and reduce_speed_outside_track:
+            # Reducir la velocidad máxima mientras esté fuera, pero permitir control del usuario
+            self.max_speed = self.original_max_speed *0.1  # Limitar la velocidad máxima a un cuarto de la original
+            # La velocidad actual se reduce, pero no debe bajar de un mínimo para que aún se mueva si el usuario no frena
+            if acceleration >= 0:
+                self.speed = max(0, self.speed * 1)
         else:
-            self.max_speed = self.max_speed
-
+            # Restablecer la velocidad máxima si el coche vuelve a la pista
+            self.max_speed = self.original_max_speed
+            self.acceleration_rate=self.originalacceleration_rate
         # Actualizar la dirección con el giro
         self.direction += steer
         self.direction %= 2 * math.pi
         # Update the position based on speed and direction
         self.position[0] += self.speed * math.cos(self.direction)
         self.position[1] += self.speed * math.sin(self.direction)
+
+        if self.lap_block_ticks > 0:
+            self.lap_block_ticks -= 1
+
+        
     def is_inside_track(self, track):
         """
         Verifica si el coche se encuentra dentro del área de la pista.
