@@ -7,7 +7,9 @@ from track import *
 import math
 from tracks import *
 import sys
-# Inicializar Pygame
+import random
+
+
 
 def draw_controls_message(screen):
     """
@@ -52,7 +54,6 @@ screen_info = pygame.display.Info()
 SCREEN_WIDTH = screen_info.current_w - 100
 SCREEN_HEIGHT = screen_info.current_h - 100
 
-import random
 background_images = ["imagenes_pista/grass.png"]
 selected_image = random.choice(background_images)
 background_image = pygame.image.load(selected_image)
@@ -62,9 +63,7 @@ background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREE
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Simulación de Pista")
 
-# Crear la pista
-# Crear la pista
-# Crear la pista
+
 # Crear la pista
 track = Track()
 
@@ -90,6 +89,7 @@ auto_car = AutoCar("AutoBot", 1)
 player_car = PlayerCar("Player1", 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist())
 # Establecer la dirección inicial del coche mirando hacia la línea de meta
 player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
+auto_car.set_start_position(spawn_point.tolist(), math.atan2(direction_vector[1], direction_vector[0]) + 8)
 
 # Asignar pista al AutoCar
 auto_car.set_track(track)
@@ -187,6 +187,7 @@ while running:
         auto_car = AutoCar("AutoBot", 1)
         player_car = PlayerCar("Player1", 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist())
         player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0]) + 8)
+        auto_car.set_start_position(spawn_point.tolist(), math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_track(track)
 
         winner_declared = False

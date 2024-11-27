@@ -3,7 +3,7 @@ import pygame
 import numpy as np
 from car3 import *
 from player_car2 import PlayerCar
-from auto_car2 import AutoCar
+from auto_car2obsoleto import AutoCar
 from track import *
 import math
 from tracks import *
