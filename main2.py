@@ -25,14 +25,25 @@ def draw_controls_message(screen):
 # Ejemplo de uso
 # Crear una instancia de Track
 
-def draw_lap_counter(screen, car):
+def draw_lap_counter(screen, car, track):
     font = pygame.font.Font(None, 36)
     lap_message = f"Vueltas: {car.lap_count}/5"
     speed_message = f"Velocidad: {car.speed:.2f}"
+
+    # Calcular la distancia al borde de la pista
+    distance_to_border = car.calculate_distance_to_border(track)
+    if distance_to_border < 0:
+        border_message = f"¡Te saliste de la pista! Distancia al borde: {-distance_to_border:.2f} unidades"
+    else:
+        border_message = f"Distancia al borde: {distance_to_border:.2f} unidades"
+
     lap_text = font.render(lap_message, True, (255, 255, 255))
     speed_text = font.render(speed_message, True, (255, 255, 255))
+    border_text = font.render(border_message, True, (255, 255, 255))
+
     screen.blit(lap_text, (10, 10))
     screen.blit(speed_text, (10, 50))
+    screen.blit(border_text, (10, 90))
 
 pygame.init()
 
@@ -112,7 +123,6 @@ clock = pygame.time.Clock()
 
 winner_declared = False
 
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -121,9 +131,8 @@ while running:
     # Obtener las teclas presionadas
     keys = pygame.key.get_pressed()
 
-    # Obtener los comandos para los coches
+    # Obtener los comandos para los coches si no hay un ganador declarado
     if not winner_declared:
-        # Obtener los comandos para los coches
         insidetrack = player_car.is_inside_track(track)
         auto_command = auto_car.get_command(keys, insidetrack)
         player_command = player_car.get_command(keys, insidetrack)
@@ -131,31 +140,37 @@ while running:
         # Enviar comandos a los coches
         auto_car.send_command(*auto_command, track)
         player_car.send_command(*player_command, track)
+
+        # Calcular la distancia al borde para el PlayerCar
+        player_distance_to_border = player_car.calculate_distance_to_border(track)
+
     # Dibujar fondo y pista
     if player_car.lap_count > 5:
-            winner_declared = True
-            winner_text = "PlayerCar Gana!"
-            player_car.set_speed(0)
-            auto_car.set_speed(0)
+        winner_declared = True
+        winner_text = "PlayerCar Gana!"
+        player_car.set_speed(0)
+        auto_car.set_speed(0)
     elif auto_car.lap_count > 5:
         winner_declared = True
         winner_text = "AutoCar Gana!"
         player_car.set_speed(0)
         auto_car.set_speed(0)
-   
+
     screen.blit(background_image, (0, 0))  # Dibujar fondo primero
     draw_track(screen, track)  # Dibujar la pista después
 
     # Dibujar coches al final para que queden encima del fondo y la pista
     auto_car.draw(screen)
     player_car.draw(screen)
-    # Actualizar la pantalla
+
+    # Mostrar el mensaje del ganador si la carrera ha terminado
     if winner_declared:
         font = pygame.font.Font(None, 74)
         text = font.render(winner_text, True, (255, 255, 255))
         text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
         screen.blit(text, text_rect)
-    
+
+    # Verificar teclas para reiniciar o salir del juego
     if keys[pygame.K_r]:
         # Reiniciar el juego (volver a crear las instancias)
         track = Track()
@@ -174,21 +189,19 @@ while running:
         player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_track(track)
 
-
         winner_declared = False
         winner_text = ""
     elif keys[pygame.K_q]:
         pygame.quit()
         sys.exit()
-    
-    draw_lap_counter(screen, player_car)  # Dibuja el contador de vueltas para el coche del jugador
+
+    # Dibujar el contador de vueltas, mensaje de controles y la distancia al borde
+    draw_lap_counter(screen, player_car, track)
     draw_controls_message(screen)
-    
+
     pygame.display.flip()
 
-    
     clock.tick(100)
-
 
 # Salir de Pygame
 pygame.quit()

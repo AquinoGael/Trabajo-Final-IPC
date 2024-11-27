@@ -1,6 +1,7 @@
 # ALUMNOS: CUIDADO SI DESEAN MODIFICAR ESTE ARCHIVO
 
 import math
+from shapely.geometry import Point, LineString
 
 from track import *
 
@@ -190,3 +191,31 @@ class Car:
             bool: True si el coche está dentro del área de la pista, False de lo contrario.
         """
         return track.is_point_inside_track(self.get_position())
+    
+    def calculate_distance_to_border(self, track: 'Track') -> float:
+        """
+        Calcula la distancia desde la posición del coche al borde más cercano de la pista.
+
+        Args:
+            track (Track): La pista en la cual el coche se encuentra.
+
+        Returns:
+            float: La distancia al borde más cercano. Si el coche está fuera de la pista, la distancia será negativa.
+        """
+        car_point = Point(self.position)
+        track_polygon = track.get_track_area_polygon()
+
+        if track_polygon.contains(car_point):
+            # Dentro de la pista, calcular distancia al borde más cercano
+            min_distance = min(
+                car_point.distance(LineString(track.inner_track)),
+                car_point.distance(LineString(track.middle_of_track))
+            )
+            return min_distance
+        else:
+            # Fuera de la pista, retornar la distancia en negativo
+            min_distance = -min(
+                car_point.distance(LineString(track.inner_track)),
+                car_point.distance(LineString(track.middle_of_track))
+            )
+            return min_distance
