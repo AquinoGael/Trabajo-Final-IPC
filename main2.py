@@ -222,12 +222,12 @@ while running:
 
         # Crear instancias del coche
         auto_car = AutoCar("AutoBot", 1)
-        player_car = PlayerCar("Player1", 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist())
+        player_car = PlayerCar("Player1", 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist(),"autos/cars.png")
         player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_start_position(spawn_point.tolist(), math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_track(track)
         if num_players ==2:
-            player_car2 = PlayerCar("Player2", 2, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist())
+            player_car2 = PlayerCar("Player2", 2, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist(),"autos/Redbull_car.png")
             player_car2.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
         winner_declared = False
         winner_text = ""
