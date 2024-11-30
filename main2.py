@@ -39,13 +39,28 @@ def draw_lap_counter(screen, car, track):
     else:
         border_message = f"Distancia al borde: {distance_to_border:.2f} unidades"
 
+    # Crear los textos
+    name_text = font.render(car.driver_name, True, (255, 255, 0))  # Nombre del jugador (color amarillo)
     lap_text = font.render(lap_message, True, (255, 255, 255))
     speed_text = font.render(speed_message, True, (255, 255, 255))
     border_text = font.render(border_message, True, (255, 255, 255))
 
-    screen.blit(lap_text, (10, 10))
-    screen.blit(speed_text, (10, 50))
-    screen.blit(border_text, (10, 90))
+    # Verificar si es PlayerCar 2 y ajustar la posición
+    if isinstance(car, PlayerCar) and car.driver_name == "Player2":
+        # Imprimir arriba a la derecha
+        screen_width = screen.get_width()
+        screen.blit(name_text, (screen_width - name_text.get_width() - 10, 10))  # Nombre del jugador
+        screen.blit(lap_text, (screen_width - lap_text.get_width() - 10, 50))
+        screen.blit(speed_text, (screen_width - speed_text.get_width() - 10, 90))
+        screen.blit(border_text, (screen_width - border_text.get_width() - 10, 130))
+    else:
+        # Imprimir arriba a la izquierda
+        screen.blit(name_text, (10, 10))  # Nombre del jugador
+        screen.blit(lap_text, (10, 50))
+        screen.blit(speed_text, (10, 90))
+        screen.blit(border_text, (10, 130))
+
+
 
 pygame.init()
 
@@ -84,9 +99,14 @@ perpendicular_vector = np.array([-direction_vector[1], direction_vector[0]])
 spawn_distance = 50  # Por ejemplo, 50 píxeles a la izquierda del punto medio
 spawn_point = midpoint - perpendicular_vector * spawn_distance
 
-# Crear el AutoCar y PlayerCar utilizando el punto de inicio calculado
-auto_car = AutoCar("AutoBot", 1)
-player_car = PlayerCar("Player1", 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist())
+auto_car = AutoCar("AutoBot", 3)
+num_players=2
+player_car = PlayerCar("Player1", 1, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist(),"autos/cars.png")
+
+if num_players ==2:
+    player_car2 = PlayerCar("Player2", 2, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist(), "autos/Redbull_car.png")
+    player_car2.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
+
 # Establecer la dirección inicial del coche mirando hacia la línea de meta
 player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
 auto_car.set_start_position(spawn_point.tolist(), math.atan2(direction_vector[1], direction_vector[0]) + 8)
@@ -133,6 +153,12 @@ while running:
 
     # Obtener los comandos para los coches si no hay un ganador declarado
     if not winner_declared:
+        
+        if num_players == 2:
+            insidetrack2=player_car2.is_inside_track(track)
+            player2_command=player_car2.get_command(keys,insidetrack2)
+            player_car2.send_command(*player2_command,track)
+            player2_distance_to_border = player_car2.calculate_distance_to_border(track)
         insidetrack = player_car.is_inside_track(track)
         auto_command = auto_car.get_command(keys, insidetrack)
         player_command = player_car.get_command(keys, insidetrack)
@@ -145,16 +171,25 @@ while running:
         player_distance_to_border = player_car.calculate_distance_to_border(track)
 
     # Dibujar fondo y pista
-    if player_car.lap_count > 5:
-        winner_declared = True
-        winner_text = "PlayerCar Gana!"
-        player_car.set_speed(0)
-        auto_car.set_speed(0)
-    elif auto_car.lap_count > 5:
-        winner_declared = True
-        winner_text = "AutoCar Gana!"
-        player_car.set_speed(0)
-        auto_car.set_speed(0)
+    if num_players==2:
+        if player_car.lap_count > 5:
+            winner_declared = True
+            winner_text = "PlayerCar Gana!"
+            player_car.set_speed(0)
+            auto_car.set_speed(0)
+            player_car2.set_speed(0)
+        elif player_car2.lap_count > 5:
+            winner_declared = True
+            winner_text = "Playercar2 Gana!"
+            player_car.set_speed(0)
+            auto_car.set_speed(0)
+            player_car2.set_speed(0)
+        elif auto_car.lap_count > 5:
+            winner_declared = True
+            winner_text = "AutoCar Gana!"
+            player_car.set_speed(0)
+            auto_car.set_speed(0)
+            player_car2.set_speed(0)
 
     screen.blit(background_image, (0, 0))  # Dibujar fondo primero
     draw_track(screen, track)  # Dibujar la pista después
@@ -162,6 +197,8 @@ while running:
     # Dibujar coches al final para que queden encima del fondo y la pista
     auto_car.draw(screen)
     player_car.draw(screen)
+    if num_players ==2:
+        player_car2.draw(screen)
 
     # Mostrar el mensaje del ganador si la carrera ha terminado
     if winner_declared:
@@ -189,7 +226,9 @@ while running:
         player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_start_position(spawn_point.tolist(), math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_track(track)
-
+        if num_players ==2:
+            player_car2 = PlayerCar("Player2", 2, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist())
+            player_car2.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
         winner_declared = False
         winner_text = ""
     elif keys[pygame.K_q]:
@@ -198,6 +237,7 @@ while running:
 
     # Dibujar el contador de vueltas, mensaje de controles y la distancia al borde
     draw_lap_counter(screen, player_car, track)
+    draw_lap_counter(screen,player_car2,track)
     draw_controls_message(screen)
 
     pygame.display.flip()
