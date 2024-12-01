@@ -11,7 +11,7 @@ blanco = (255, 255, 255)
 
 screen = pygame.display.set_mode((largo, alto))
 pygame.display.set_caption("Turbo Track")
-
+5
 # Clock setup
 clock = pygame.time.Clock()
 def manejar_eventos(salir=True):

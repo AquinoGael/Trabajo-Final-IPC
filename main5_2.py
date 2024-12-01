@@ -1,6 +1,14 @@
 import pygame
 import sys
 import time
+import numpy as np
+from car3 import *
+from player_car2 import PlayerCar
+from auto_car2 import AutoCar
+from track import *
+import math
+from tracks import *
+import random
 
 # Inicializar Pygame
 pygame.init()
@@ -8,12 +16,12 @@ pygame.init()
 # Dimensiones de la ventana
 largo, alto = 800, 600
 blanco = (255, 255, 255)
-
 screen = pygame.display.set_mode((largo, alto))
 pygame.display.set_caption("Turbo Track")
 
 # Clock setup
 clock = pygame.time.Clock()
+
 def manejar_eventos(salir=True):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -33,43 +41,37 @@ def renderizar_texto_con_contorno(texto, fuente, color_texto, color_contorno, po
     screen.blit(fuente.render(texto, True, color_texto), rect)
 
 def pantalla_de_inicio():
-    
     fondo = pygame.transform.scale(pygame.image.load("Imagenes y demas descargas/pantalla_inicio.png"), (largo, alto))
     fuente = pygame.font.Font('imagenes y demas descargas/PressStart2P.ttf', 20)
     colores = [(92, 225, 230), blanco]
     indice_color, tiempo_anterior = 0, pygame.time.get_ticks()
-
     while True:
         if manejar_eventos():
             return
         if pygame.time.get_ticks() - tiempo_anterior > 500:
             indice_color = 1 - indice_color
             tiempo_anterior = pygame.time.get_ticks()
-
         screen.blit(fondo, (0, 0))
         renderizar_texto_con_contorno("Press any key to continue", fuente, colores[indice_color], blanco, (largo // 2-20, alto - 100))
         pygame.display.flip()
         clock.tick(60)
+
 def pantalla_eleccion_modo():
     '''pantalla de eleccion del modo de juego'''
     # Cargar la imagen de fondo
     fondo = pygame.image.load("imagenes y demas descargas/pantalla_eleccion.png")
     fondo = pygame.transform.scale(fondo, (largo , alto))
-
     # Configuración de la fuente
     fuente = pygame.font.Font('imagenes y demas descargas/PressStart2P.ttf', 40)
-
     # Opciones de texto y posiciones individuales
     opciones = [
         {"texto": "1. 1 player", "posicion": (largo // 2, alto // 2 - 50)},
         {"texto": "2. 2 players", "posicion": ((largo // 2)+24, (alto // 2)+20)},
         {"texto": "3. Instructions", "posicion": (largo // 2, (alto // 2 + 50)+35)},
     ]
-
     # Colores iniciales
     COLOR_BASE = (92, 225, 230)
     COLOR_ALTERNADO = (255, 255, 255)
-
     tiempo_cambio = 500  # Tiempo en ms para alternar el color
     ultima_actualizacion = pygame.time.get_ticks()
     mostrar_color_base = True  # Alternar entre los colores
@@ -80,8 +82,15 @@ def pantalla_eleccion_modo():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                return  # Salir de la pantalla de elección
-
+                if event.key == pygame.K_1:
+                    pantalla_eleccion_personaje(1)
+                    return
+                elif event.key == pygame.K_2:
+                    pantalla_eleccion_personaje(2)
+                    return
+                #elif event.key == pygame.K_3:
+                 #   pantalla_instrucciones()
+                  #  return
         # Alternar colores de texto
         tiempo_actual = pygame.time.get_ticks()
         if tiempo_actual - ultima_actualizacion >= tiempo_cambio:
@@ -100,20 +109,21 @@ def pantalla_eleccion_modo():
             texto_rect = texto_surface.get_rect(center=opcion["posicion"])
             screen.blit(texto_surface, texto_rect)
 
-                #running = False
         # Actualizar la pantalla
         pygame.display.flip()
         clock.tick(60)
 
-def pantalla_eleccion_personaje():
+def pantalla_eleccion_personaje(num_players):
     '''pantalla de eleccion de personaje'''
+    # Verificar si la pantalla de Pygame aún está activa
+    if not pygame.get_init():
+        return
+
     # Cargar la imagen de fondo
     background_imagez = pygame.image.load('Imagenes y demas descargas/eleccion_personajes.png')
     background_image = pygame.transform.scale(background_imagez, (largo, alto))
-
     # Fuente de letras
     font = pygame.font.Font('imagenes y demas descargas/PressStart2P.ttf', 25)
-
     # Ubicación del texto animado
     text_data = [
         {'text': 'Press W', 'pos': (5, 520), 'colors': [(255, 255, 255), (92, 225, 230)]},
@@ -121,8 +131,9 @@ def pantalla_eleccion_personaje():
         {'text': 'Press R', 'pos': (405, 520), 'colors': [(255, 255, 255), (92, 225, 230)]},
         {'text': 'Press F', 'pos': (615, 520), 'colors': [(255, 255, 255), (92, 225, 230)]},
     ]
-
     toggle_index = 0
+
+    players_selected = 0  # Contador de jugadores que han seleccionado personaje
 
     while True:
         for event in pygame.event.get():
@@ -130,37 +141,38 @@ def pantalla_eleccion_personaje():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
-                #si eligen a un personaje, sale su pantalla de carga
+                # Si eligen a un personaje, sale su pantalla de carga
                 if event.key == pygame.K_w:  
                     pantalla_de_carga_personaje('pantalla_personajes/colapinto.png', (173, 216, 230), (0, 0, 128), 'Williams')
+                    players_selected += 1
                 elif event.key == pygame.K_r: 
                     pantalla_de_carga_personaje('pantalla_personajes/red bull.png', (255, 0, 0), (0, 0, 128), 'Red Bull')
+                    players_selected += 1
                 elif event.key == pygame.K_f:  
                     pantalla_de_carga_personaje('pantalla_personajes/ferrari.png', (255, 20, 0), (255, 24, 7), 'Ferrari')
+                    players_selected += 1
                 elif event.key == pygame.K_m:
-                    pantalla_de_carga_personaje('pantalla_personajes/mclaren.png', (254, 80, 0), (255,200,0), 'Mc Laren')
-                return 
+                    pantalla_de_carga_personaje('pantalla_personajes/mclaren.png', (254, 80, 0), (255, 200, 0), 'McLaren')
+                    players_selected += 1
+                
+                # Verificar si ya se seleccionaron los personajes necesarios
+                if players_selected == num_players:
+                    return
 
         # Dibujar la imagen de fondo
         screen.blit(background_image, (0, 0))
-
         # Dibujar el texto
         for data in text_data:
             color = data['colors'][toggle_index % 2]
             text_surface = font.render(data['text'], True, color)
             screen.blit(text_surface, data['pos'])
-
+        
         # Actualizar la pantalla
         pygame.display.flip()
-
         # Alternar índice de colores
         toggle_index += 1
         pygame.time.delay(500)  # Retraso en la animación
-# Inicialización de Pygame
-pygame.init()
 
-# Configuración de la pantalla
-#screen = pygame.display.set_mode((largo, alto))
 # Función para mostrar la pantalla de cargar
 def pantalla_de_carga_personaje(nombre_archivo, color_principal, color_secundario, nombre):
     '''pantalla de carga dependiendo la eleccion de personaje
@@ -169,6 +181,10 @@ def pantalla_de_carga_personaje(nombre_archivo, color_principal, color_secundari
     color_principal(list): indica el color con el que va a ir alternando el titular
     color_barra(list): indica el color de la barra de carga
     nombre(str): nombre de la marca representante'''
+    # Verificar si la pantalla de Pygame aún está activa
+    if not pygame.get_init():
+        return
+
     # Colores personalizados segun el personaje elegido
     color_principal = color_principal
     color_barra = color_secundario
@@ -197,7 +213,6 @@ def pantalla_de_carga_personaje(nombre_archivo, color_principal, color_secundari
     # Bucle principal
     running = True
     while running:
-
         # Dibujar la imagen de fondo
         screen.blit(fondo, (0, 0))
 
@@ -221,19 +236,18 @@ def pantalla_de_carga_personaje(nombre_archivo, color_principal, color_secundari
         # Eventos
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                sys.exit()
 
         # Actualizar la pantalla
         pygame.display.flip()
         pygame.time.delay(500)  # Retraso para la animación
-
         # Salir cuando la barra de carga esté completa
         if progress >= 1:
             running = False
 
     # Finalizar Pygame
     pygame.quit()
-
 def main():
     '''funcion principal del programa'''
     pygame.mixer_music.load('stressed_out.mp3')
@@ -242,7 +256,5 @@ def main():
     pantalla_eleccion_modo()
     pantalla_eleccion_personaje()
     pygame.quit()
-
 if __name__ == "__main__":
     main()
-    
