@@ -133,7 +133,7 @@ class AutoCar(Car):
         # Si el auto está fuera de la pista, ajustar la dirección
         if not is_inside_track:
             acceleration *= 0.5  # Reducir la aceleración para evitar descontrolarse
-            steer += self.turn_rate if self.position[0] < 0 else -self.turn_rate
+            steer += (self.turn_rate*0.5) if self.position[0] < 0 else (-self.turn_rate*0.5)
 
         # Update the previous direction to prevent reversing
         self.previous_direction = self.get_direction()
