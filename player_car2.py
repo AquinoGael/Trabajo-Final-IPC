@@ -8,7 +8,7 @@ class PlayerCar(Car):
         super().__init__(driver_name, car_number)
         self.movement_keys = movement_keys
         self.car_image = pygame.image.load(image)  # Load car image for player cars
-        self.car_image = pygame.transform.scale(self.car_image, (60, 40))  # Adjust car image size (height > width)
+        self.car_image = pygame.transform.scale(self.car_image, (40, 20))  # Adjust car image size (height > width)
         self.set_position(spawn_point)  # Set initial position to the spawn point
 
     def get_command(self, pygame_keys, is_inside_track):

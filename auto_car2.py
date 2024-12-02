@@ -16,7 +16,7 @@ class AutoCar(Car):
         """
         super().__init__(driver_name, car_number)
         self.track = None  # Track instance to keep reference to the track
-        self.car_image = pygame.image.load("autos/ferrari_car.png")  # Load car image for auto cars
+        self.car_image = pygame.image.load(car_number)  # Load car image for auto cars
         self.car_image = pygame.transform.scale(self.car_image, (40, 20))  # Scale car image to appropriate size
         self.previous_direction = 0  # Store the previous direction to prevent reversing
 
@@ -55,11 +55,11 @@ class AutoCar(Car):
         car_direction = self.get_direction() + angle_offset
         direction_vector = np.array([math.cos(car_direction), math.sin(car_direction)])
 
-        for distance in range(1, 100):  # Check for 100 units forward
+        for distance in range(1, 50):  # Check for 100 units forward
             point_to_check = car_position + direction_vector * distance
             if not self.track.is_point_inside_track(point_to_check):
                 return distance
-        return 100  # Maximum distance
+        return 50  # Maximum distance
 
     def get_command(self, pygame_keys: dict, is_inside_track: bool) -> tuple[float, float]:
         """
@@ -108,13 +108,13 @@ class AutoCar(Car):
             else:
                 steer = max(direction_diff, -self.turn_rate)
 
-        # Use sensors to check distance to edges at +45 and -45 degrees
+        
         distance_pos_45 = self.get_distance_to_edge(math.radians(45))
         distance_neg_45 = self.get_distance_to_edge(math.radians(-45))
 
         # Adjust acceleration based on distances to the edge
         if distance_pos_45 < 20 or distance_neg_45 < 20:
-            acceleration *= 0.5  # Reduce speed if getting too close to the edge
+            acceleration *= 0.0025  # Reduce speed if getting too close to the edge
 
         # Adjust steering to stay near the lower edge of the track
         lower_edge_distance = self.get_distance_to_edge(math.radians(90))
@@ -122,7 +122,7 @@ class AutoCar(Car):
 
         # Mantenerse cerca del borde inferior
         if lower_edge_distance > upper_edge_distance:
-            steer -= 0.1  # Incrementar la tendencia a girar hacia el borde inferior
+            steer -= 0.05  # Incrementar la tendencia a girar hacia el borde inferior
         else:
             steer += 0.05  # Ajustar ligeramente si se aleja mucho del borde superior
 
@@ -132,8 +132,8 @@ class AutoCar(Car):
 
         # Si el auto está fuera de la pista, ajustar la dirección
         if not is_inside_track:
-            acceleration *= 0.5  # Reducir la aceleración para evitar descontrolarse
-            steer += self.turn_rate if self.position[0] < 0 else -self.turn_rate
+            acceleration *= 0.0025  # Reducir la aceleración para evitar descontrolarse
+            steer += (self.turn_rate*0.5) if self.position[0] < 0 else (-self.turn_rate*0.5)
 
         # Update the previous direction to prevent reversing
         self.previous_direction = self.get_direction()
