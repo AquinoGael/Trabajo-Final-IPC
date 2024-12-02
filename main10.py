@@ -334,10 +334,10 @@ spawn_distance = 50  # Por ejemplo, 50 píxeles a la izquierda del punto medio
 spawn_point = midpoint - perpendicular_vector * spawn_distance
 auto_car = AutoCar("AutoBot", 3)
 personaje_jugador_1 = personajes_elegidos[0]
-player_car = PlayerCar(personaje_jugador_1['nombre'], 1, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist(),personaje_jugador_1['imagen'])
+player_car = PlayerCar(personaje_jugador_1['nombre'], 1, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist(),personaje_jugador_1['imagen'])
 if num_players ==2:
     personaje_jugador_2 = personajes_elegidos[1]
-    player_car2 = PlayerCar(personaje_jugador_2['nombre'], 2, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist(), personaje_jugador_2['imagen'])   
+    player_car2 = PlayerCar(personaje_jugador_2['nombre'], 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist(), personaje_jugador_2['imagen'])   
     player_car2.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
 # Establecer la dirección inicial del coche mirando hacia la línea de meta
 player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
@@ -437,12 +437,12 @@ while running:
         spawn_point = midpoint - perpendicular_vector * spawn_distance
         # Crear instancias del coche
         auto_car = AutoCar("AutoBot", 1)
-        player_car = PlayerCar(personaje_jugador_1['nombre'], 1, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist(),personaje_jugador_1['imagen'])
+        player_car = PlayerCar(personaje_jugador_1['nombre'], 1, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist(),personaje_jugador_1['imagen'])
         player_car.set_direction(math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_start_position(spawn_point.tolist(), math.atan2(direction_vector[1], direction_vector[0]) + 8)
         auto_car.set_track(track)
         if num_players ==2:
-            player_car2 = PlayerCar(personaje_jugador_2['nombre'], 2, [pygame.K_w, pygame.K_s, pygame.K_a, pygame.K_d], spawn_point.tolist(),personaje_jugador_2['imagen'])
+            player_car2 = PlayerCar(personaje_jugador_2['nombre'], 2, [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT], spawn_point.tolist(),personaje_jugador_2['imagen'])
             player_car2.set_direction(math.atan2(direction_vector[1], direction_vector[0])+8)
         winner_declared = False
         winner_text = ""
