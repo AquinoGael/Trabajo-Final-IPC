@@ -26,3 +26,4 @@ El desarrollo del proyecto siguió las siguientes etapas:
 1. Clonar el repositorio desde GitHub:  
    ```bash
    https://github.com/AquinoGael/Trabajo-Final-IPC.git
+2. Correr el codigo llamado "codigo_principal.py"
