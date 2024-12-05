@@ -163,7 +163,7 @@ def pantalla_eleccion_personaje(num_players):
                     pantalla_de_carga_personaje('pantalla_personajes/mclaren.png', (254, 80, 0), (255, 200, 0), 'McLaren')
                     players_selected += 1
                 # Verificar si ya se seleccionaron los personajes necesarios
-               
+                    
                 if players_selected == num_players: 
                     personajes_no_elegidos=[personaje for personaje in personajes_disponibles if personaje not in personajes_elegidos]
         # Dibujar la imagen de fondo
@@ -289,7 +289,7 @@ def draw_lap_counter(screen, car, track):
     speed_text = font.render(speed_message, True, (255, 255, 255))
     border_text = font.render(border_message, True, (255, 255, 255))
     # Verificar si es PlayerCar 2 y ajustar la posición2
-    if isinstance(car, PlayerCar) and car.driver_name == personaje_random['nombre']:
+    if isinstance(car, PlayerCar) and car==player_car2:
         # Imprimir arriba a la derecha
         screen_width = screen.get_width()
         screen.blit(name_text, (screen_width - name_text.get_width() - 10, 10))  # Nombre del jugador
