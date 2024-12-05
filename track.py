@@ -340,7 +340,6 @@ def draw_track(screen, track):
     finish_line_image = pygame.image.load("imagenes_pista/finish_line.png")
     finish_line_rect = finish_line_image.get_rect()
     finish_line_length = np.linalg.norm(np.array(finish_line_end) - np.array(finish_line_start))
-    scale_factor = finish_line_length / finish_line_rect.width
     new_height = int(finish_line_rect.height * 0.2)  # Reducir la altura a la mitad
     finish_line_image = pygame.transform.scale(finish_line_image, (int(finish_line_length), new_height))
     finish_line_angle = math.degrees(math.atan2(finish_line_end[1] - finish_line_start[1], finish_line_end[0] - finish_line_start[0]))
