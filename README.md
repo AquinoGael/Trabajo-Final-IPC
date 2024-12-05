@@ -1,6 +1,6 @@
 # Trabajo-Final-IPC *Turbo Track*
 ## 📚 Introducción
-En el marco de la materia **Introducción al Pensamiento Científico**, hemos desarrollado el proyecto *Turbo Track*, un juego de carreras que combina elementos básicos de programación y diseño lógico para fomentar la creatividad y el pensamiento estructurado.  
+En el marco de la materia **Introducción al Pensamiento Computacional o**, hemos desarrollado el proyecto *Turbo Track*, un juego de carreras que combina elementos básicos de programación y diseño lógico para fomentar la creatividad y el pensamiento estructurado.  
 Este proyecto busca aplicar conceptos teóricos desarrollados a lo largo de la materia, analizando y diseñando un juego de carreras similar al estilo retro
 ## 🎯 Objetivos del Proyecto  
 - Diseñar un entorno de simulación para un juego de carreras en 2D de 1 y/o 2 personas.  
